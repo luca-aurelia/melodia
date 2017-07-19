@@ -1,0 +1,19 @@
+.mountain > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.mountain .overlay {
+  z-index: 1;
+}
+
+.mountain path:hover {
+  stroke: red;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
