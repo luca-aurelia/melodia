@@ -11,7 +11,8 @@ const start = paths => {
   const nearEdge = p =>
     closeTo(p.x, 0) || closeTo(p.y, 0) ||
     closeTo(p.x, 1) || closeTo(p.y, 1)
-  paper.view.viewSize = new paper.Size(image.width, image.height)
+  paper.view.viewSize = new paper.Size(image.naturalWidth, image.naturalHeight)
+  console.log(paper.view.viewSize)
   paths.forEach(path => {
     path.strokeColor = 'black'
     path.opacity = 0.0
@@ -69,7 +70,10 @@ const start = paths => {
 
 export default class PaperMountain extends Component {
   gotCanvas (canvas) {
+    const image = document.querySelector('.mountain img')
     paper.setup(canvas)
+    // canvas.width = image.width
+    // canvas.height = image.height
     paper.project.importSVG(mountainSVG, group => {
       const children = group.children.slice().filter(child => child.getIntersections)
       group.remove()
@@ -82,7 +86,7 @@ export default class PaperMountain extends Component {
   }
   render (props) {
     return <div className='mountain'>
-      <canvas className='overlay' ref={this.gotCanvas.bind(this)} />
+      <canvas data-hidpi='off' className='overlay' ref={this.gotCanvas.bind(this)} />
       <img src={mountainImage} alt='mountain' />
     </div>
   }

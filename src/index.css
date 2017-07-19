@@ -1,15 +1,20 @@
+.mountain {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
 .mountain > * {
   position: absolute;
   top: 0;
-  left: 0;
+  min-height: 100%;
+  width: 100vw;
+  object-fit: cover;
 }
 
 .mountain .overlay {
   z-index: 1;
-}
-
-.mountain path:hover {
-  stroke: red;
 }
 
 body {
