@@ -17,10 +17,11 @@ const scale = [
 ]
 const play = points => {
   points = points.map(({ x, y }) => ({ x, y: 1 - y }))
+  const offset = points[0].x
   const notes = points.map(({ x, y }) => {
     return {
       pitch: scale[Math.round(y * (scale.length - 1))],
-      time: x * 100
+      time: (x - offset) * 100
     }
   })
   notes.forEach(note => {

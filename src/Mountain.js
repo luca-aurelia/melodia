@@ -1,4 +1,3 @@
-import InlineSVG from 'react-inlinesvg'
 import React, { Component } from 'react'
 import mountainSVG from './mountain.svg'
 import mountainImage from './mountain.jpg'
@@ -43,7 +42,6 @@ function getPointsByPath () {
 export default class Mountain extends Component {
   render (props) {
     return <div className='mountain'>
-      <InlineSVG className='overlay' onLoad={getPointsByPath} src={mountainSVG} />
       <img src={mountainImage} alt='mountain' />
     </div>
   }
