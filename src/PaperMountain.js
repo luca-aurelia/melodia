@@ -35,7 +35,6 @@ const start = (paths, image) => {
   }
   tool.onMouseUp = onMouseUp
   tool.onMouseMove = onMouseMove
-  // const xSamplingInterval = image.bounds.width / 100
   const xSamplingInterval = image.bounds.width / 100
   paths.forEach(path => {
     path.intersectionGroup = new paper.Group()
@@ -73,7 +72,7 @@ export default class PaperMountain extends Component {
   gotCanvas (canvas) {
     paper.setup(canvas)
     paper.project.importSVG(mountainVector, group => {
-      group.fitBounds(paper.view.bounds, true)
+      group.fitBounds(paper.view.bounds, false)
       const children = group.children.slice().filter(child => child.getIntersections)
       group.remove()
       group.removeChildren()
@@ -85,7 +84,7 @@ export default class PaperMountain extends Component {
         position: paper.view.center
       })
       raster.onLoad = () => {
-        raster.fitBounds(paper.view.bounds, true)
+        raster.fitBounds(paper.view.bounds, false)
         raster.sendToBack()
         start(children, raster)
       }

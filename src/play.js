@@ -1,4 +1,6 @@
 import Tone from 'tone'
+import separateMelodies from './cluster'
+
 const synth = new Tone.PolySynth(6, Tone.Synth).toMaster()
 
 const round = (value, precision = 0) => {
@@ -34,6 +36,13 @@ const toNote = (noteCoordinate, index, points) => {
   }
 }
 
+const not = fun => (...args) => !fun(...args)
+const isRepeat = (note, index, notes) => {
+  if (index === 0) return false
+  const previousNote = notes[index - 1]
+  return note.pitch === previousNote.pitch
+}
+
 const playNote = note => {
   var velocity = (Math.random() * 0.5) + 0.5
   const time = '+' + (note.time * 0.1)
@@ -41,10 +50,16 @@ const playNote = note => {
 }
 
 const play = points => {
-  const notes = points
-    .map(toNoteCoordinate)
-    .map(toNote)
-  notes.forEach(playNote)
+  const melodies = separateMelodies(points)
+  console.log(melodies.map(m => m.centroid))
+  melodies.forEach((melody, i) => {
+    if (i !== 0) {
+      return
+    }
+    melody.map(toNoteCoordinate)
+      .map(toNote)
+      .forEach(playNote)
+  })
 }
 
 export default play
