@@ -45,7 +45,6 @@ const play = points => {
     .map(toNoteCoordinate)
     .map(toNote)
   notes.forEach(playNote)
-  console.log(notes)
 }
 
 export default play

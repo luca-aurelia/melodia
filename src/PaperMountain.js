@@ -6,8 +6,8 @@ import play from './play'
 
 const tool = new paper.Tool()
 const closeTo = (x, y, sigma = 0.001) => Math.abs(x - y) < sigma
-const start = paths => {
-  const image = document.querySelector('.mountain img')
+const start = (paths, image) => {
+  // const image = document.querySelector('.mountain img')
   const nearEdge = ({ x, y }) =>
     closeTo(x, 0) || closeTo(y, 0) ||
     closeTo(x, 1) || closeTo(y, 1)
@@ -18,10 +18,11 @@ const start = paths => {
     path.strokeWidth = 5
   })
   const onMouseMove = event => {
+    // console.log(event.item)
     paths.forEach(path => {
       path.intersectionGroup.visible = false
     })
-    if (event.item) {
+    if (event.item && event.item.intersectionGroup) {
       event.item.intersectionGroup.visible = true
     }
   }
@@ -34,22 +35,23 @@ const start = paths => {
   }
   tool.onMouseUp = onMouseUp
   tool.onMouseMove = onMouseMove
-  const xSamplingInterval = image.width / 100
+  // const xSamplingInterval = image.bounds.width / 100
+  const xSamplingInterval = image.bounds.width / 100
   paths.forEach(path => {
     path.intersectionGroup = new paper.Group()
     path.intersectionGroup.visible = false
-    for (var x = 0; x < image.width; x += xSamplingInterval) {
+    for (var x = 0; x < image.bounds.width; x += xSamplingInterval) {
       const vertical = new paper.Path()
       vertical.visible = false
       vertical.add(new paper.Point(x, 0))
-      vertical.add(new paper.Point(x, image.height))
+      vertical.add(new paper.Point(x, image.bounds.height))
 
       const intersections = path.getIntersections(vertical)
       intersections.forEach(intersection => {
         const p = intersection.point
         const normalizedP = {
-          x: p.x / image.width,
-          y: p.y / image.height
+          x: p.x / image.bounds.width,
+          y: p.y / image.bounds.height
         }
         if (nearEdge(normalizedP)) {
           return
@@ -78,13 +80,20 @@ export default class PaperMountain extends Component {
       children.forEach(child => {
         paper.project.activeLayer.addChild(child)
       })
-      start(children)
+      const raster = new paper.Raster({
+        source: mountainRaster,
+        position: paper.view.center
+      })
+      raster.onLoad = () => {
+        raster.fitBounds(paper.view.bounds, true)
+        raster.sendToBack()
+        start(children, raster)
+      }
     }, { insert: false })
   }
   render (props) {
     return <div className='mountain'>
       <canvas className='overlay' data-paper-resize='true' ref={this.gotCanvas.bind(this)} />
-      <img src={mountainRaster} alt='mountain' />
     </div>
   }
 }
