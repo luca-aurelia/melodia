@@ -1,21 +1,20 @@
 import React, { Component } from 'react'
 import paper from 'paper'
-import mountainSVG from './mountain.svg'
-import mountainImage from './mountain.jpg'
+import mountainVector from './mountain.svg'
+import mountainRaster from './mountain.jpg'
 import play from './play'
 
 const tool = new paper.Tool()
 const closeTo = (x, y, sigma = 0.001) => Math.abs(x - y) < sigma
 const start = paths => {
   const image = document.querySelector('.mountain img')
-  const nearEdge = p =>
-    closeTo(p.x, 0) || closeTo(p.y, 0) ||
-    closeTo(p.x, 1) || closeTo(p.y, 1)
-  paper.view.viewSize = new paper.Size(image.naturalWidth, image.naturalHeight)
-  console.log(paper.view.viewSize)
+  const nearEdge = ({ x, y }) =>
+    closeTo(x, 0) || closeTo(y, 0) ||
+    closeTo(x, 1) || closeTo(y, 1)
+  // paper.view.viewSize = new paper.Size(image.naturalWidth, image.naturalHeight)
   paths.forEach(path => {
     path.strokeColor = 'black'
-    path.opacity = 0.0
+    path.opacity = 0.5
     path.strokeWidth = 5
   })
   const onMouseMove = event => {
@@ -70,11 +69,9 @@ const start = paths => {
 
 export default class PaperMountain extends Component {
   gotCanvas (canvas) {
-    const image = document.querySelector('.mountain img')
     paper.setup(canvas)
-    // canvas.width = image.width
-    // canvas.height = image.height
-    paper.project.importSVG(mountainSVG, group => {
+    paper.project.importSVG(mountainVector, group => {
+      group.fitBounds(paper.view.bounds, true)
       const children = group.children.slice().filter(child => child.getIntersections)
       group.remove()
       group.removeChildren()
@@ -86,8 +83,8 @@ export default class PaperMountain extends Component {
   }
   render (props) {
     return <div className='mountain'>
-      <canvas data-hidpi='off' className='overlay' ref={this.gotCanvas.bind(this)} />
-      <img src={mountainImage} alt='mountain' />
+      <canvas className='overlay' data-paper-resize='true' ref={this.gotCanvas.bind(this)} />
+      <img src={mountainRaster} alt='mountain' />
     </div>
   }
 }
