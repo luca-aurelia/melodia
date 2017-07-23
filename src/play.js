@@ -53,9 +53,10 @@ const play = points => {
   const melodies = separateMelodies(points)
   console.log(melodies.map(m => m.centroid))
   melodies.forEach((melody, i) => {
-    if (i !== 0) {
+    if (i !== 1) {
       return
     }
+    console.log(melody.centroid)
     melody.map(toNoteCoordinate)
       .map(toNote)
       .forEach(playNote)

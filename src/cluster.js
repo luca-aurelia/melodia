@@ -6,7 +6,7 @@ const cluster = points => {
   const result = kmeans(
     points.map(toNestedArray),
     2,
-    'random'
+    [[0], [1]]
   )
 
   return result.clusters
