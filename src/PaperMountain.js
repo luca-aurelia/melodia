@@ -3,42 +3,25 @@ import paper from 'paper'
 import mountainVector from './mountain.svg'
 import mountainRaster from './mountain.jpg'
 import play from './play'
+import LookAlike from 'look-alike'
+import separateMelodies from './cluster'
 
 const tool = new paper.Tool()
 const closeTo = (x, y, sigma = 0.001) => Math.abs(x - y) < sigma
 const start = (paths, image) => {
-  // const image = document.querySelector('.mountain img')
   const nearEdge = ({ x, y }) =>
     closeTo(x, 0) || closeTo(y, 0) ||
     closeTo(x, 1) || closeTo(y, 1)
-  // paper.view.viewSize = new paper.Size(image.naturalWidth, image.naturalHeight)
   paths.forEach(path => {
     path.strokeColor = 'black'
     path.opacity = 0.5
     path.strokeWidth = 5
   })
-  const onMouseMove = event => {
-    // console.log(event.item)
-    paths.forEach(path => {
-      path.intersectionGroup.visible = false
-    })
-    if (event.item && event.item.intersectionGroup) {
-      event.item.intersectionGroup.visible = true
-    }
-  }
-  const onMouseUp = event => {
-    if (event.item && event.item.intersectionGroup) {
-      const intersections = event.item.intersectionGroup.children
-        .map(intersection => intersection.normalizedCenter)
-      play(intersections)
-    }
-  }
-  tool.onMouseUp = onMouseUp
-  tool.onMouseMove = onMouseMove
   const xSamplingInterval = image.bounds.width / 100
+  const allPoints = []
   paths.forEach(path => {
     path.intersectionGroup = new paper.Group()
-    path.intersectionGroup.visible = false
+    path.intersectionGroup.visible = true
     for (var x = 0; x < image.bounds.width; x += xSamplingInterval) {
       const vertical = new paper.Path()
       vertical.visible = false
@@ -62,10 +45,37 @@ const start = (paths, image) => {
           parent: path.intersectionGroup
         })
         circle.normalizedCenter = normalizedP
+        allPoints.push(circle)
+        // hack for Look-Alike library
+        circle.toString = () => '[object Object]'
       })
       vertical.remove()
     }
   })
+  const melodies = separateMelodies(
+    allPoints,
+    intersection => intersection.normalizedCenter
+  )
+  const lookAlikes = new LookAlike(allPoints, {
+    attributes: ['x', 'y'],
+    key: circle => {
+      const key = { x: circle.position.x, y: circle.position.y }
+      return key
+    }
+  })
+  const onMouseMove = event => {
+    const p = { x: event.point.x, y: event.point.y }
+    const nearestNeighbor = lookAlikes.query(p, { normalize: false })[0]
+    allPoints.forEach(p => { p.visible = false })
+    melodies[nearestNeighbor.clusterId].forEach(p => { p.visible = true })
+  }
+  const onMouseUp = event => {
+    const p = { x: event.point.x, y: event.point.y }
+    const nearestNeighbor = lookAlikes.query(p, { normalize: false })[0]
+    play(melodies[nearestNeighbor.clusterId].map(circle => circle.normalizedCenter))
+  }
+  tool.onMouseUp = onMouseUp
+  tool.onMouseMove = onMouseMove
 }
 
 export default class PaperMountain extends Component {

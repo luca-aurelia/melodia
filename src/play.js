@@ -1,5 +1,4 @@
 import Tone from 'tone'
-import separateMelodies from './cluster'
 
 const synth = new Tone.PolySynth(6, Tone.Synth).toMaster()
 
@@ -49,18 +48,10 @@ const playNote = note => {
   synth.triggerAttackRelease(note.pitch, 0.1, time, velocity)
 }
 
-const play = points => {
-  const melodies = separateMelodies(points)
-  console.log(melodies.map(m => m.centroid))
-  melodies.forEach((melody, i) => {
-    if (i !== 1) {
-      return
-    }
-    console.log(melody.centroid)
-    melody.map(toNoteCoordinate)
-      .map(toNote)
-      .forEach(playNote)
-  })
+const play = melody => {
+  melody.map(toNoteCoordinate)
+    .map(toNote)
+    .forEach(playNote)
 }
 
 export default play
